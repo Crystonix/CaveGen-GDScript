@@ -9,13 +9,15 @@ extends Node2D
 @export_range(0,1,0.05) var init_threshold:float = 0
 
 @export_category("CA")
-@export var Iterations:int = 1
+@export_range(0,50,1) var Iterations:int = 0
+@export_range(0.1,0.5,0.1) var animation:float = 0.1
+
+var voxel_data:Array = []
 
 func _ready():
-	var voxel_data:Array = generate_initial_voxel_data(GRID_SIZE)
+	voxel_data = generate_initial_voxel_data(GRID_SIZE)
 	update_texture(voxel_data)
-	cam.offset = Vector2(GRID_SIZE.x/2, GRID_SIZE.y/2)
-	apply_ca_rules(Iterations, voxel_data)
+	
 	
 func generate_initial_voxel_data(grid:Vector2) -> Array:
 	var voxel_data:Array = []
@@ -41,10 +43,10 @@ func create_texture_from_voxel_data(voxel_data:Array) -> ImageTexture:
 			image.set_pixel(x, y, Color(color_value / 255.0, color_value / 255.0, color_value / 255.0))
 	return ImageTexture.create_from_image(image)
 
-func apply_ca_rules(iterations:int, data:Array):
+func apply_ca_rules(iterations:int, data:Array) -> Array:
 	if iterations <= 0:
-		update_texture(data)
 		print("finished iterating")
+		return data
 	else:
 		var updated_grid:Array
 		for x in range(GRID_SIZE.x):
@@ -55,12 +57,14 @@ func apply_ca_rules(iterations:int, data:Array):
 				if data[x][y][0] > 0:
 					updated_grid[x][y].append(0 if neighbour_count < 4 else 255)
 				else:
-					updated_grid[x][y].append(0)
-		print("grid iterated")
-		return apply_ca_rules(iterations-1,updated_grid)
+					updated_grid[x][y].append(255 if neighbour_count > 4 else 0)
+		update_texture(updated_grid)
+		await get_tree().create_timer(animation).timeout
+		print("grid update")
+		return await apply_ca_rules(iterations-1,updated_grid)
 
-func update_texture(voxel_data:Array):
-	texture_rect.texture = create_texture_from_voxel_data(voxel_data)
+func update_texture(p_data:Array):
+	texture_rect.set_texture(create_texture_from_voxel_data(p_data))
 
 func count_neighbours(grid:Array,x:int,y:int) -> int:
 	var count:int = 0
@@ -81,3 +85,18 @@ func sample_voxel_texture(texture: ImageTexture, uv: Vector2) -> bool:
 	var size = image.get_size()
 	var pixel:Color = image.get_pixelv(Vector2(uv) * Vector2(size))
 	return (pixel.r > 0.5)
+
+
+func _on_start_button_pressed():
+	voxel_data = await apply_ca_rules(Iterations, voxel_data)
+	update_texture(voxel_data)
+
+
+func _on_init_new_button_pressed():
+	voxel_data = generate_initial_voxel_data(GRID_SIZE)
+	update_texture(voxel_data)
+
+
+func _on_animation_h_slider_value_changed(value):
+	animation = value
+	$CanvasLayer/UI/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/Number.set_text(str(value))

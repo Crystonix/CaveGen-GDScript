@@ -1,24 +1,104 @@
-[gd_scene load_steps=2 format=3 uid="uid://cr4252vfh5xma"]
+[gd_scene load_steps=3 format=3 uid="uid://cr4252vfh5xma"]
 
 [ext_resource type="Script" path="res://Scenes/Main/main.gd" id="1_mj6br"]
 
-[node name="Main" type="Node2D" node_paths=PackedStringArray("texture_rect", "cam")]
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_8tu8x"]
+size = Vector2(512, 512)
+
+[node name="Main" type="Node2D" node_paths=PackedStringArray("texture_rect")]
 script = ExtResource("1_mj6br")
-texture_rect = NodePath("UI/Panel/TextureRect")
-cam = NodePath("UI/Panel/TextureRect/Camera2D")
+texture_rect = NodePath("CanvasLayer/UI/Panel/TextureRect")
 GRID_SIZE = Vector2(64, 64)
-init_threshold = 0.4
+init_threshold = 0.45
+Iterations = 4
 
-[node name="UI" type="Control" parent="."]
+[node name="Camera2D" type="Camera2D" parent="."]
+visible = false
+enabled = false
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="UI" type="Control" parent="CanvasLayer"]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Panel" type="Panel" parent="UI"]
-layout_mode = 0
+[node name="Panel" type="Panel" parent="CanvasLayer/UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="UI/Panel"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/UI/Panel"]
 texture_filter = 1
-layout_mode = 0
+custom_minimum_size = Vector2(512, 512)
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -256.0
+offset_right = 256.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("PlaceholderTexture2D_8tu8x")
+stretch_mode = 5
 
-[node name="Camera2D" type="Camera2D" parent="UI/Panel/TextureRect"]
-zoom = Vector2(4, 4)
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/UI"]
+layout_mode = 0
+offset_right = 71.0
+offset_bottom = 31.0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/UI/MarginContainer"]
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="CanvasLayer/UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Start CA"
+
+[node name="InitNewButton" type="Button" parent="CanvasLayer/UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Init new"
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UI/MarginContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 1
+
+[node name="AnimationHSlider" type="HSlider" parent="CanvasLayer/UI/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(70, 5)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+min_value = 0.1
+max_value = 0.5
+step = 0.1
+value = 0.5
+ticks_on_borders = true
+
+[node name="Number" type="Label" parent="CanvasLayer/UI/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "??"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="CanvasLayer/UI/MarginContainer/VBoxContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UI/MarginContainer/VBoxContainer/InitNewButton" to="." method="_on_init_new_button_pressed"]
+[connection signal="value_changed" from="CanvasLayer/UI/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer/AnimationHSlider" to="." method="_on_animation_h_slider_value_changed"]
