@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3 uid="uid://cr4252vfh5xma"]
+
+[ext_resource type="Script" path="res://Scenes/Main/main.gd" id="1_mj6br"]
+
+[node name="Main" type="Node2D" node_paths=PackedStringArray("texture_rect", "cam")]
+script = ExtResource("1_mj6br")
+texture_rect = NodePath("UI/Panel/TextureRect")
+cam = NodePath("UI/Panel/TextureRect/Camera2D")
+GRID_SIZE = Vector2(64, 64)
+init_threshold = 0.4
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Panel" type="Panel" parent="UI"]
+layout_mode = 0
+
+[node name="TextureRect" type="TextureRect" parent="UI/Panel"]
+texture_filter = 1
+layout_mode = 0
+
+[node name="Camera2D" type="Camera2D" parent="UI/Panel/TextureRect"]
+zoom = Vector2(4, 4)
