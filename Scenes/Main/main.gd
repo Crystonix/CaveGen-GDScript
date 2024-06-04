@@ -42,7 +42,10 @@ func update_texture(p_ca:CAErosion):
 
 #region Signals
 func _on_erode_button_pressed():
+	var start = Time.get_ticks_usec()
 	ca.erode(erode_batch_size)
+	var end = Time.get_ticks_usec()
+	print("erode-time: ",(end-start)/1000000.0)
 	update_texture(ca)
 
 func _on_init_button_pressed():
